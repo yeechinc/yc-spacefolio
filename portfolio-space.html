@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Yee Chin — Portfolio</title>
+<meta name="description" content="Yee Chin — NUS Business AI Systems student and product management intern. Fly around a little pixel solar system to see my work, projects and CCAs.">
+<meta name="theme-color" content="#0a0e27">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Yee Chin — Portfolio">
+<meta property="og:description" content="Fly a pixel astronaut around my solar system: education, work, projects, CCAs.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Crect width='22' height='22' fill='%230a0e27'/%3E%3Crect x='6' y='2' width='10' height='8' fill='%23f7f8fc'/%3E%3Crect x='7' y='4' width='8' height='4' fill='%2316233f'/%3E%3Crect x='8' y='5' width='2' height='2' fill='%234ecdc4'/%3E%3Crect x='6' y='10' width='10' height='9' fill='%23f2f3f8'/%3E%3Crect x='9' y='13' width='4' height='4' fill='%234ecdc4'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #0a0e27;
+    overflow: hidden;
+    font-family: 'Space Mono', monospace;
+  }
+  #world {
+    position: relative;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, #151332 0%, #0a0e27 70%);
+  }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fff;
+    image-rendering: pixelated;
+    animation: twinkle 3s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  .planet {
+    position: absolute;
+    width: 150px; height: 150px;
+    cursor: pointer;
+    animation: drift 40s ease-in-out infinite;
+  }
+  .planet-svg {
+    width: 100%; height: 100%;
+    overflow: visible;
+    display: block;
+    filter: drop-shadow(0 0 18px rgba(255,255,255,0.10));
+    transition: transform 0.25s ease-out;
+  }
+  /* slow, lazy wander — reads like a lowkey orbit, never fast */
+  @keyframes drift {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(14px, -10px); }
+    50%  { transform: translate(6px, 14px); }
+    75%  { transform: translate(-12px, 4px); }
+    100% { transform: translate(0, 0); }
+  }
+  /* proximity focus */
+  .planet.focused, #socials.focused { z-index: 20; animation-play-state: paused; }
+  .planet.focused .planet-svg, #socials.focused .planet-svg {
+    animation: focus-pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes focus-pulse {
+    0%, 100% { transform: scale(1.16); filter: drop-shadow(0 0 14px rgba(255,255,255,0.30)); }
+    50%      { transform: scale(1.22); filter: drop-shadow(0 0 32px rgba(255,255,255,0.55)); }
+  }
+  #focus-prompt {
+    position: fixed;
+    z-index: 40;
+    transform: translate(-50%, -100%);
+    display: none;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 1.6;
+    color: #0a0e27;
+    background: #ffd580;
+    border: 2px solid #fff;
+    padding: 7px 10px;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 0 0 2px #0a0e27, 0 6px 0 rgba(0,0,0,0.35);
+    animation: prompt-bob 1.1s ease-in-out infinite;
+    pointer-events: none;
+  }
+  #focus-prompt.show { display: block; }
+  #focus-prompt.below { transform: translate(-50%, 0); }
+  #focus-prompt .key { color: #b23360; }
+  body.touch #focus-prompt { pointer-events: auto; cursor: pointer; }
+  @keyframes prompt-bob {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: -5px; }
+  }
+  /* floating decorations */
+  #deco { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+  .deco { position: absolute; image-rendering: pixelated; }
+  .deco svg { display: block; shape-rendering: crispEdges; overflow: visible; }
+  .deco.spin-slow svg { animation: deco-rot 18s linear infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes deco-rot { to { transform: rotate(360deg); } }
+  @keyframes deco-drift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(var(--dx, 16px), var(--dy, -12px)); }
+  }
+  .shoot {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fff;
+    box-shadow: 0 0 6px 1px #fff;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .shoot::after {
+    content: '';
+    position: absolute;
+    right: 2px; top: 0;
+    width: 60px; height: 2px;
+    background: linear-gradient(to left, #ffffffcc, transparent);
+  }
+  .planet-label {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #fff;
+    white-space: nowrap;
+    text-shadow: 2px 2px 0 #000;
+  }
+  #education { top: 11%; left: 5%;  animation-duration: 38s; animation-delay: -4s; }
+  #work     { top: 54%; left: 3%;  animation-duration: 46s; animation-delay: -20s; }
+  #projects { top: 17%; left: 72%; animation-duration: 42s; animation-delay: -12s; }
+  #hobbies  { top: 60%; left: 74%; animation-duration: 52s; animation-delay: -30s; }
+  #socials {
+    position: absolute;
+    top: 5%; left: 45%;
+    width: 104px; height: 84px;
+    cursor: pointer;
+    animation: drift 34s ease-in-out -8s infinite;
+  }
+  #socials .planet-svg { filter: drop-shadow(0 0 10px rgba(120,200,255,0.18)); }
+  #socials .dish-spin { animation: dish-spin 8s linear infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes dish-spin { to { transform: rotate(360deg); } }
+  #sun {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 190px; height: 190px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe082, #ff9800);
+    box-shadow: 0 0 80px rgba(255, 152, 0, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 14px;
+    animation: sun-glow 5s ease-in-out infinite;
+  }
+  @keyframes sun-glow {
+    0%, 100% { box-shadow: 0 0 70px rgba(255, 152, 0, 0.45); }
+    50%      { box-shadow: 0 0 110px rgba(255, 152, 0, 0.65); }
+  }
+  #sun-hi {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #7a3f00;
+    margin-bottom: 8px;
+  }
+  #sun-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 15px;
+    line-height: 1.3;
+    color: #2a1800;
+  }
+  #astronaut {
+    position: absolute;
+    width: 44px; height: 56px;
+    z-index: 10;
+    will-change: left, top;
+  }
+  #astro-inner {
+    width: 100%; height: 100%;
+    transition: transform 0.12s ease-out;
+  }
+  #astro-inner.face-left { transform: scaleX(-1); }
+  #astro-sprite {
+    width: 100%; height: 100%;
+    shape-rendering: crispEdges;
+    animation: astro-float 2.6s ease-in-out infinite;
+  }
+  @keyframes astro-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  #astro-sprite g { transform-box: fill-box; }
+  /* idle limb sway */
+  #astro-sprite .arm-l { transform-origin: top center; animation: sway-a 2.6s ease-in-out infinite; }
+  #astro-sprite .arm-r { transform-origin: top center; animation: sway-b 2.6s ease-in-out infinite; }
+  #astro-sprite .leg-l, #astro-sprite .leg-r { transform-origin: top center; }
+  @keyframes sway-a { 0%,100% { transform: rotate(5deg); }  50% { transform: rotate(-3deg); } }
+  @keyframes sway-b { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(3deg); } }
+  /* walking */
+  #astronaut.walk #astro-sprite { animation: astro-float 0.42s ease-in-out infinite; }
+  #astronaut.walk .leg-l { animation: step-a 0.42s steps(1,end) infinite; }
+  #astronaut.walk .leg-r { animation: step-b 0.42s steps(1,end) infinite; }
+  #astronaut.walk .arm-l { animation: step-b 0.42s steps(1,end) infinite; }
+  #astronaut.walk .arm-r { animation: step-a 0.42s steps(1,end) infinite; }
+  @keyframes step-a { 0%,49% { transform: rotate(22deg); }  50%,100% { transform: rotate(-22deg); } }
+  @keyframes step-b { 0%,49% { transform: rotate(-22deg); } 50%,100% { transform: rotate(22deg); } }
+  .astro-jet { opacity: 0; transition: opacity 0.1s; }
+  #astronaut.walk .astro-jet { opacity: 1; animation: flame 0.18s steps(1,end) infinite alternate; }
+  @keyframes flame { from { transform: scaleY(0.6); } to { transform: scaleY(1.15); } }
+  @media (prefers-reduced-motion: reduce) {
+    #astro-sprite, #astronaut.walk #astro-sprite,
+    #astro-sprite .arm-l, #astro-sprite .arm-r,
+    #astronaut.walk .leg-l, #astronaut.walk .leg-r,
+    #astronaut.walk .arm-l, #astronaut.walk .arm-r,
+    .planet, #socials, .deco, .deco.spin-slow svg, .star { animation: none; }
+  }
+
+  #panel-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(5, 5, 20, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  #panel {
+    background: #151332;
+    border: 3px solid #ffffff33;
+    border-radius: 4px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 28px;
+    color: #e8e8f0;
+  }
+  #panel h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  #panel p, #panel li {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  #panel ul { padding-left: 18px; margin-bottom: 14px; }
+  #panel .entry-title { font-weight: bold; color: #ffd580; margin-top: 14px; }
+  #panel a { color: #6be0d6; text-decoration: none; border-bottom: 1px dotted #6be0d6aa; word-break: break-word; }
+  #panel a:hover { color: #fff; border-bottom-color: #fff; }
+  #close-btn {
+    margin-top: 16px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    background: #ff6b9d;
+    color: #151332;
+    border: none;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  #hint {
+    position: fixed;
+    bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #ffffff88;
+    text-align: center;
+    padding: 0 12px;
+    pointer-events: none;
+  }
+
+  /* ---- touch controls (mobile) ---- */
+  #dpad {
+    position: fixed;
+    left: 18px; bottom: 18px;
+    width: 132px; height: 132px;
+    z-index: 45;
+    display: none;
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
+  }
+  #dpad button {
+    position: absolute;
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.10);
+    border: 2px solid rgba(255,255,255,0.35);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    border-radius: 6px;
+    padding: 0;
+  }
+  #dpad button:active { background: rgba(255,213,128,0.55); }
+  #dpad .up    { left: 44px; top: 0; }
+  #dpad .down  { left: 44px; top: 88px; }
+  #dpad .left  { left: 0;   top: 44px; }
+  #dpad .right { left: 88px; top: 44px; }
+  body.touch #dpad { display: block; }
+  body.touch #hint { display: none; }
+  @media (pointer: coarse) {
+    #dpad { display: block; }
+    #hint { display: none; }
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width: 720px) {
+    .planet { width: 108px; height: 108px; }
+    #education { top: 9%;  left: 3%; }
+    #work     { top: 40%; left: 2%; }
+    #projects { top: 8%;  left: 62%; }
+    #hobbies  { top: 62%; left: 60%; }
+    #socials  { top: 4%;  left: 40%; width: 84px; height: 68px; }
+    #sun { width: 150px; height: 150px; }
+    #sun-hi { font-size: 8px; }
+    #sun-name { font-size: 12px; }
+    #panel { padding: 22px 18px; max-height: 78vh; }
+    #panel h2 { font-size: 12px; }
+    #panel p, #panel li { font-size: 12px; }
+    #focus-prompt { font-size: 8px; }
+  }
+  @media (max-width: 420px) {
+    .planet { width: 92px; height: 92px; }
+    #dpad { width: 120px; height: 120px; left: 12px; bottom: 12px; }
+    #dpad button { width: 40px; height: 40px; }
+    #dpad .up, #dpad .down { left: 40px; }
+    #dpad .left, #dpad .right { top: 40px; }
+    #dpad .down { top: 80px; }
+    #dpad .right { left: 80px; }
+  }
+</style>
+</head>
+<body>
+<div id="world">
+  <div id="sun">
+    <div id="sun-hi">hi, i'm</div>
+    <div id="sun-name">YEE CHIN!</div>
+  </div>
+
+  <div id="deco"></div>
+
+  <div class="planet" id="education" onclick="openPanel('education')">
+    <div class="planet-label">EDUCATION</div>
+  </div>
+  <div class="planet" id="work" onclick="openPanel('work')">
+    <div class="planet-label">WORK EXP</div>
+  </div>
+  <div class="planet" id="projects" onclick="openPanel('projects')">
+    <div class="planet-label">PROJECTS</div>
+  </div>
+  <div class="planet" id="hobbies" onclick="openPanel('hobbies')">
+    <div class="planet-label">CCA</div>
+  </div>
+  <div id="socials" onclick="openPanel('socials')">
+    <svg class="planet-svg" viewBox="0 0 32 26" shape-rendering="crispEdges" aria-hidden="true">
+      <!-- solar panels -->
+      <rect x="0" y="9" width="9" height="8" fill="#2b3f6b"/>
+      <rect x="1" y="10" width="3" height="6" fill="#5b8dd6"/>
+      <rect x="5" y="10" width="3" height="6" fill="#5b8dd6"/>
+      <rect x="23" y="9" width="9" height="8" fill="#2b3f6b"/>
+      <rect x="24" y="10" width="3" height="6" fill="#5b8dd6"/>
+      <rect x="28" y="10" width="3" height="6" fill="#5b8dd6"/>
+      <rect x="9" y="12" width="14" height="2" fill="#9aa3b2"/>
+      <!-- body -->
+      <rect x="12" y="7" width="8" height="12" fill="#c9cfdb"/>
+      <rect x="12" y="7" width="8" height="2" fill="#eef1f7"/>
+      <rect x="12" y="17" width="8" height="2" fill="#8b93a4"/>
+      <rect x="14" y="11" width="4" height="3" fill="#ffb454"/>
+      <!-- dish -->
+      <g class="dish-spin">
+        <rect x="14" y="1" width="4" height="4" fill="#e4e8f0"/>
+        <rect x="15" y="2" width="2" height="2" fill="#7f8798"/>
+        <rect x="15" y="5" width="2" height="3" fill="#9aa3b2"/>
+      </g>
+    </svg>
+  </div>
+
+  <div id="astronaut">
+    <div id="astro-inner">
+      <svg id="astro-sprite" viewBox="0 0 22 30" shape-rendering="crispEdges" aria-hidden="true">
+        <!-- exhaust (only visible while walking) -->
+        <g class="astro-jet" style="transform-box:fill-box;transform-origin:top center;">
+          <rect x="8"  y="27" width="2" height="3" fill="#ff9f5a"/>
+          <rect x="12" y="27" width="2" height="3" fill="#ffd580"/>
+        </g>
+        <!-- backpack -->
+        <rect x="4" y="9" width="3" height="9" fill="#8a90a0"/>
+        <rect x="4" y="9" width="3" height="2" fill="#a9afbd"/>
+        <!-- left arm -->
+        <g class="arm-l"><rect x="3" y="10" width="3" height="6" fill="#e9ebf2"/><rect x="3" y="15" width="3" height="2" fill="#ff9f5a"/></g>
+        <!-- right arm -->
+        <g class="arm-r"><rect x="16" y="10" width="3" height="6" fill="#e9ebf2"/><rect x="16" y="15" width="3" height="2" fill="#ff9f5a"/></g>
+        <!-- torso -->
+        <rect x="6" y="9" width="10" height="11" fill="#f2f3f8"/>
+        <rect x="6" y="9" width="10" height="2" fill="#ffffff"/>
+        <rect x="6" y="18" width="10" height="2" fill="#c3c7d4"/>
+        <rect x="9" y="12" width="4" height="4" fill="#4ecdc4"/>
+        <rect x="10" y="13" width="1" height="1" fill="#d7fffb"/>
+        <!-- legs -->
+        <g class="leg-l"><rect x="7" y="20" width="3" height="6" fill="#e9ebf2"/><rect x="7" y="25" width="3" height="2" fill="#ff9f5a"/></g>
+        <g class="leg-r"><rect x="12" y="20" width="3" height="6" fill="#e9ebf2"/><rect x="12" y="25" width="3" height="2" fill="#ff9f5a"/></g>
+        <!-- helmet -->
+        <rect x="6" y="1" width="10" height="8" fill="#f7f8fc"/>
+        <rect x="5" y="3" width="1" height="4" fill="#f7f8fc"/>
+        <rect x="16" y="3" width="1" height="4" fill="#f7f8fc"/>
+        <rect x="7" y="3" width="8" height="4" fill="#16233f"/>
+        <rect x="8" y="4" width="2" height="2" fill="#4ecdc4"/>
+        <rect x="12" y="4" width="2" height="1" fill="#8be6df"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div id="focus-prompt"></div>
+
+<div id="hint">ARROW KEYS / WASD TO MOVE &nbsp;·&nbsp; SPACE TO VIEW</div>
+
+<div id="dpad" aria-hidden="true">
+  <button class="up"    data-dir="up">▲</button>
+  <button class="left"  data-dir="left">◀</button>
+  <button class="right" data-dir="right">▶</button>
+  <button class="down"  data-dir="down">▼</button>
+</div>
+
+<div id="panel-overlay">
+  <div id="panel">
+    <div id="panel-content"></div>
+    <button id="close-btn" onclick="closePanel()">CLOSE</button>
+  </div>
+</div>
+
+<script>
+// Generate starfield
+const world = document.getElementById('world');
+for (let i = 0; i < 120; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.animationDelay = Math.random() * 3 + 's';
+  world.insertBefore(star, world.firstChild);
+}
+
+// Build chunky pixel-art planets (pure SVG, no image files).
+// Everything is drawn on a 32x32 integer grid so it reads as real pixels.
+const GRID = 32, PC = 16, PR = 13;
+const PLANET_ART = {
+  education: { base:'#3fb8b0', dark:'#1f6b66', light:'#a8f2eb',
+    craters:[[9,9,3],[20,19,2.2],[23,12,1.5],[13,7,1.3]] },
+  work:      { base:'#f0894a', dark:'#a8481b', light:'#ffd9b8', bands:true,
+    craters:[[22,8,2],[10,22,1.6]] },
+  projects:  { base:'#5cc36f', dark:'#2f7a41', light:'#c6f5cf', ring:true,
+    craters:[[12,11,2.6],[9,19,2],[21,22,1.7]] },
+  hobbies:   { base:'#f0608f', dark:'#a82f5c', light:'#ffc0d8',
+    craters:[[10,10,2.7],[22,9,1.9],[24,19,1.7],[12,22,1.3]] }
+};
+// Collect pixel rows where test(px,py) is true AND the pixel sits inside the disc.
+function pxRuns(test, ox) {
+  ox = ox || 0;
+  let out = '';
+  for (let py = 0; py < GRID; py++) {
+    let start = -1;
+    for (let px = 0; px <= GRID; px++) {
+      const inDisc = px < GRID &&
+        (px + 0.5 - PC) ** 2 + (py + 0.5 - PC) ** 2 <= PR * PR;
+      const on = inDisc && test(px, py);
+      if (on && start < 0) start = px;
+      if ((!on || px === GRID) && start >= 0) {
+        out += `<rect x="${start + ox}" y="${py}" width="${px - start}" height="1"/>`;
+        start = -1;
+      }
+    }
+  }
+  return out;
+}
+function fillLayer(test, fill, opacity, ox) {
+  const r = pxRuns(test, ox);
+  return r ? `<g fill="${fill}"${opacity != null ? ` opacity="${opacity}"` : ''}>${r}</g>` : '';
+}
+function craterLayer(cfg, ox) {
+  let s = '';
+  (cfg.craters || []).forEach(([cx, cy, r]) => {
+    s += fillLayer((px, py) => (px + 0.5 - cx) ** 2 + (py + 0.5 - cy) ** 2 <= r * r, cfg.dark, null, ox);
+    s += fillLayer((px, py) => (px + 0.6 - cx) ** 2 + (py + 0.9 - cy) ** 2 <= Math.max(r - 1.1, 0.4) ** 2, cfg.base, null, ox);
+    s += fillLayer((px, py) => (px + 0.5 - (cx - r * 0.4)) ** 2 + (py + 0.5 - (cy - r * 0.4)) ** 2 <= 0.7, cfg.light, 0.55, ox);
+  });
+  return s;
+}
+// surface = the part that scrolls sideways to fake rotation
+function surface(cfg, ox) {
+  let s = fillLayer(() => true, cfg.base, null, ox);
+  s += fillLayer((px, py) => (px + 0.5 - (PC - 4)) ** 2 + (py + 0.5 - (PC - 3)) ** 2 <= 20, cfg.light, 0.12, ox);
+  if (cfg.bands) {
+    s += fillLayer((px, py) => py >= 6 && py < 10, cfg.dark, 0.28, ox);
+    s += fillLayer((px, py) => py >= 14 && py < 19, cfg.light, 0.24, ox);
+    s += fillLayer((px, py) => py >= 22 && py < 25, cfg.dark, 0.26, ox);
+  }
+  s += craterLayer(cfg, ox);
+  return s;
+}
+function ringRuns(front, ry) {
+  let out = '';
+  for (let py = 0; py < GRID; py++) {
+    for (let px = -2; px < GRID + 2; px++) {
+      const v = ((px + 0.5 - PC) / 16.5) ** 2 + ((py + 0.5 - (PC + 2)) / ry) ** 2;
+      if (v > 1 || v < 0.52) continue;
+      if (front && py + 0.5 < PC + 2) continue;
+      if (!front && py + 0.5 >= PC + 2) continue;
+      out += `<rect x="${px}" y="${py}" width="1" height="1"/>`;
+    }
+  }
+  return out;
+}
+function planetSVG(cfg, id) {
+  const clip = 'pclip-' + id;
+  return `<svg class="planet-svg" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true">
+    <defs><clipPath id="${clip}">${pxRuns(() => true)}</clipPath></defs>
+    ${cfg.ring ? `<g fill="${cfg.dark}">${ringRuns(false, 3.6)}</g>` : ''}
+    <g clip-path="url(#${clip})">
+      ${surface(cfg, 0)}
+      ${fillLayer((px, py) => (px + 0.5 - (PC + 4)) ** 2 + (py + 0.5 - (PC + 4)) ** 2 > (PR + 1.5) ** 2, '#05010f', 0.32)}
+      ${fillLayer((px, py) => {
+        const d = (px + 0.5 - (PC - 3)) ** 2 + (py + 0.5 - (PC - 3)) ** 2;
+        return d <= PR * PR && d > (PR - 1.6) ** 2;
+      }, cfg.light, 0.5)}
+    </g>
+    ${cfg.ring ? `<g fill="${cfg.light}">${ringRuns(true, 3.6)}</g>` : ''}
+  </svg>`;
+}
+Object.keys(PLANET_ART).forEach(id => {
+  document.getElementById(id).insertAdjacentHTML('afterbegin', planetSVG(PLANET_ART[id], id));
+});
+
+// Floating decorations — pure eye-candy, no interaction
+const deco = document.getElementById('deco');
+const DECO_SVG = {
+  sat: `<svg width="34" height="20" viewBox="0 0 34 20">
+    <g fill="#2b3f6b"><rect x="0" y="6" width="8" height="8"/><rect x="26" y="6" width="8" height="8"/></g>
+    <g fill="#5b8dd6"><rect x="1" y="7" width="2" height="6"/><rect x="4" y="7" width="2" height="6"/><rect x="28" y="7" width="2" height="6"/><rect x="31" y="7" width="2" height="6"/></g>
+    <rect x="8" y="9" width="18" height="2" fill="#9aa3b2"/>
+    <g fill="#d2d7e2"><rect x="13" y="5" width="8" height="10"/></g>
+    <rect x="15" y="7" width="4" height="3" fill="#ffb454"/>
+  </svg>`,
+  ufo: `<svg width="34" height="20" viewBox="0 0 34 20">
+    <rect x="12" y="2" width="10" height="5" fill="#8be6df"/>
+    <rect x="14" y="1" width="6" height="2" fill="#c7fffb"/>
+    <rect x="4" y="8" width="26" height="4" fill="#c9cfdb"/>
+    <rect x="1" y="10" width="32" height="3" fill="#9aa3b2"/>
+    <g fill="#ffd580"><rect x="5" y="13" width="3" height="2"/><rect x="15" y="14" width="3" height="2"/><rect x="25" y="13" width="3" height="2"/></g>
+  </svg>`,
+  rock: `<svg width="22" height="20" viewBox="0 0 22 20">
+    <g fill="#6b6f7a"><rect x="4" y="3" width="12" height="14"/><rect x="2" y="6" width="18" height="8"/><rect x="6" y="1" width="8" height="18"/></g>
+    <g fill="#4a4e58"><rect x="7" y="6" width="3" height="3"/><rect x="13" y="10" width="4" height="3"/><rect x="5" y="12" width="3" height="2"/></g>
+    <g fill="#8a8e99"><rect x="6" y="3" width="3" height="2"/><rect x="11" y="5" width="2" height="2"/></g>
+  </svg>`
+};
+const DECO_ITEMS = [
+  { t:'rock', left:'22%', top:'38%', s:1.1,  dur:26, dx:'18px',  dy:'-14px', spin:true },
+  { t:'rock', left:'50%', top:'82%', s:0.7,  dur:22, dx:'-14px', dy:'-10px', spin:true },
+  { t:'rock', left:'86%', top:'80%', s:0.9,  dur:30, dx:'12px',  dy:'16px',  spin:true },
+  { t:'rock', left:'38%', top:'20%', s:0.55, dur:18, dx:'-10px', dy:'12px',  spin:true },
+  { t:'sat',  left:'30%', top:'66%', s:0.9,  dur:24, dx:'22px',  dy:'-8px' },
+  { t:'sat',  left:'82%', top:'34%', s:0.7,  dur:30, dx:'-18px', dy:'12px' },
+  { t:'ufo',  left:'60%', top:'40%', s:0.85, dur:20, dx:'26px',  dy:'-6px' }
+];
+DECO_ITEMS.forEach((d, i) => {
+  const el = document.createElement('div');
+  el.className = 'deco' + (d.spin ? ' spin-slow' : '');
+  el.style.left = d.left;
+  el.style.top = d.top;
+  el.style.setProperty('--dx', d.dx);
+  el.style.setProperty('--dy', d.dy);
+  el.style.transform = `scale(${d.s})`;
+  el.style.animation = `deco-drift ${d.dur}s ease-in-out ${-i * 2}s infinite`;
+  el.innerHTML = DECO_SVG[d.t];
+  deco.appendChild(el);
+});
+
+// Occasional shooting star
+function shootingStar() {
+  const s = document.createElement('div');
+  s.className = 'shoot';
+  s.style.left = (10 + Math.random() * 70) + '%';
+  s.style.top = (Math.random() * 45) + '%';
+  const dist = 220 + Math.random() * 160;
+  s.animate([
+    { transform: 'translate(0,0)', opacity: 1 },
+    { transform: `translate(${dist}px, ${dist * 0.5}px)`, opacity: 0 }
+  ], { duration: 700 + Math.random() * 400, easing: 'ease-in' });
+  world.appendChild(s);
+  setTimeout(() => s.remove(), 1300);
+  setTimeout(shootingStar, 4000 + Math.random() * 6000);
+}
+setTimeout(shootingStar, 3000);
+
+// Astronaut movement
+const astro = document.getElementById('astronaut');
+const astroInner = document.getElementById('astro-inner');
+let x = window.innerWidth / 2 - 22;
+let y = Math.min(window.innerHeight - 130, window.innerHeight / 2 + 180);
+let vx = 0, vy = 0;
+const MAX_SPEED = 4.6, ACCEL = 0.55, FRICTION = 0.80;
+const keys = {};
+
+// Touch: on-screen D-pad
+const dpadDir = { up: false, down: false, left: false, right: false };
+if (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) {
+  document.body.classList.add('touch');
+}
+document.querySelectorAll('#dpad button').forEach(btn => {
+  const d = btn.dataset.dir;
+  const set = v => e => { e.preventDefault(); dpadDir[d] = v; };
+  btn.addEventListener('touchstart', set(true), { passive: false });
+  btn.addEventListener('touchend', set(false));
+  btn.addEventListener('touchcancel', set(false));
+  btn.addEventListener('mousedown', set(true));
+  btn.addEventListener('mouseup', set(false));
+  btn.addEventListener('mouseleave', set(false));
+});
+
+document.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if (k === ' ' || e.code === 'Space') {
+    e.preventDefault();
+    if (focusedId && !panelOpen) openPanel(focusedId);
+    else if (panelOpen) closePanel();
+  }
+  if (k === 'escape' && panelOpen) closePanel();
+});
+document.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+
+const PROMPT_LABELS = {
+  education: 'EDUCATION', work: 'WORK', projects: 'PROJECTS',
+  hobbies: 'CCA', socials: 'CONTACT'
+};
+const promptEl = document.getElementById('focus-prompt');
+let focusedId = null;
+
+let lastT = performance.now();
+function updateAstro(now) {
+  now = now || performance.now();
+  const dt = Math.min((now - lastT) / 16.67, 2.5);
+  lastT = now;
+
+  let ix = 0, iy = 0;
+  if (keys['arrowup'] || keys['w'] || dpadDir.up) iy -= 1;
+  if (keys['arrowdown'] || keys['s'] || dpadDir.down) iy += 1;
+  if (keys['arrowleft'] || keys['a'] || dpadDir.left) ix -= 1;
+  if (keys['arrowright'] || keys['d'] || dpadDir.right) ix += 1;
+
+  if (ix || iy) {
+    const len = Math.hypot(ix, iy);
+    vx += (ix / len) * ACCEL * dt;
+    vy += (iy / len) * ACCEL * dt;
+    if (ix < 0) astroInner.classList.add('face-left');
+    if (ix > 0) astroInner.classList.remove('face-left');
+  }
+
+  const fr = Math.pow(FRICTION, dt);
+  vx *= fr; vy *= fr;
+  const sp = Math.hypot(vx, vy);
+  if (sp > MAX_SPEED) { vx = vx / sp * MAX_SPEED; vy = vy / sp * MAX_SPEED; }
+  if (sp < 0.04) { vx = 0; vy = 0; }
+
+  x = Math.max(0, Math.min(window.innerWidth - 44, x + vx * dt));
+  y = Math.max(0, Math.min(window.innerHeight - 56, y + vy * dt));
+  astro.style.left = x + 'px';
+  astro.style.top = y + 'px';
+  astro.classList.toggle('walk', Math.hypot(vx, vy) > 0.35);
+
+  updateFocus();
+  requestAnimationFrame(updateAstro);
+}
+
+function updateFocus() {
+  const targets = document.querySelectorAll('.planet, #socials');
+  const a = astro.getBoundingClientRect();
+  const aX = a.left + a.width / 2, aY = a.top + a.height / 2;
+  let near = null, nearD = Infinity, nearRect = null;
+  targets.forEach(p => {
+    const r = p.getBoundingClientRect();
+    const d = Math.hypot(r.left + r.width / 2 - aX, r.top + r.height / 2 - aY);
+    if (d < r.width / 2 + 55 && d < nearD) { near = p; nearD = d; nearRect = r; }
+  });
+
+  const id = near ? near.id : null;
+  if (id !== focusedId) {
+    if (focusedId) document.getElementById(focusedId).classList.remove('focused');
+    focusedId = id;
+    if (near) {
+      near.classList.add('focused');
+      const verb = document.body.classList.contains('touch') ? 'TAP' : 'SPACE';
+      const what = near.id === 'socials' ? 'CONTACT' : 'VIEW ' + PROMPT_LABELS[near.id];
+      promptEl.innerHTML = '<span class="key">&#9670;</span> ' + verb + ' &mdash; ' + what;
+      promptEl.classList.toggle('show', !panelOpen);
+    } else {
+      promptEl.classList.remove('show');
+    }
+  }
+  if (focusedId && !panelOpen && nearRect) {
+    promptEl.classList.add('show');
+    const cx = Math.max(90, Math.min(window.innerWidth - 90, nearRect.left + nearRect.width / 2));
+    promptEl.style.left = cx + 'px';
+    const below = nearRect.top - 6 < 46;
+    promptEl.classList.toggle('below', below);
+    promptEl.style.top = (below ? nearRect.bottom + 6 : nearRect.top - 6) + 'px';
+  } else if (panelOpen) {
+    promptEl.classList.remove('show');
+  }
+}
+
+let panelOpen = false;
+const content = {
+  education: `<h2>EDUCATION</h2>
+    <p>Doing a degree that sits right between product and AI.</p>
+    <div class="entry-title">National University of Singapore</div>
+    <p>B.Comp, Business AI Systems &nbsp;·&nbsp; Aug 2025 – May 2029</p>
+    <ul>
+      <li>NUS Merit Scholarship</li>
+      <li>Coursework across AI systems, data analytics, and product management</li>
+    </ul>`,
+  work: `<h2>WORK EXPERIENCE</h2>
+    <p>Two PM internships so far — one big platform, one 0-to-1 AI build.</p>
+    <div class="entry-title">Shopee — Product Management Intern</div>
+    <p>Aug 2026 – present</p>
+    <ul>
+      <li>Run UAT on internal portals and app features before they ship</li>
+      <li>Turn stakeholder requirements into proposals for regional teams</li>
+      <li>Dig into competitor moves and market trends to shape the roadmap</li>
+    </ul>
+    <div class="entry-title">Mighty Jaxx — Product Management Intern</div>
+    <p>May 2026 – Aug 2026</p>
+    <ul>
+      <li>Owned an AI invoice-processing agent from scratch — cut processing time ~80%</li>
+      <li>Wrote the full PRD, user flows, phased roadmap and Jira tickets end to end</li>
+      <li>Designed the extraction layer as shared infra for future internal agents</li>
+      <li>Ran UAT and worked day-to-day with devs and the lead PM</li>
+    </ul>
+    <div class="entry-title">MyBracesClinic — Dental Assistant Intern</div>
+    <p>Feb 2025 – Jun 2025</p>
+    <ul>
+      <li>Assisted treatments and kept rooms + instruments to hygiene standards</li>
+      <li>Started a recycling initiative for used Invisalign aligners and packaging</li>
+      <li>Used AI tools to help track patients' aligner progress</li>
+    </ul>`,
+  projects: `<h2>PROJECTS</h2>
+    <p>Things I've built and shipped, mostly with a team.</p>
+    <div class="entry-title">LooWhere? — NUS Orbital (CP2106)</div>
+    <p>Apollo 11 (Advanced) · Honourable Mention · May 2026 – Aug 2026</p>
+    <ul>
+      <li>Community-powered app for finding public toilets in Singapore</li>
+      <li>Learned full-stack from zero: map, filter chips, ratings & reviews</li>
+      <li>Auth + live location data via OneMap and Google Maps APIs</li>
+      <li>React Native / Expo, Node / Express, Supabase — pitched at Splashdown</li>
+      <li><a href="https://github.com/yeechinc/loowhere-orbital" target="_blank" rel="noopener">github.com/yeechinc/loowhere-orbital</a></li>
+    </ul>
+    <div class="entry-title">SmokeSmart — Hack for Cities 2026</div>
+    <p>Team Lead · Top 8 Finalist · Jan 2026 – Feb 2026</p>
+    <ul>
+      <li>AI decision-support tool for placing Designated Smoking Areas</li>
+      <li>Model built from regulatory data, foot traffic and public complaints</li>
+      <li>Geospatial heatmaps + a planning UI for urban planners</li>
+      <li>Pitched to a panel of industry experts</li>
+      <li><a href="https://github.com/yeechinc/smoke-smart-hfc" target="_blank" rel="noopener">github.com/yeechinc/smoke-smart-hfc</a></li>
+    </ul>`,
+  hobbies: `<h2>CCA</h2>
+    <p>Where the rest of my time at NUS goes.</p>
+    <ul>
+      <li><b>NUS Developer Group</b> — Head of Product</li>
+      <li><b>Kent Ridge Hall FWOC</b> — Programmes Committee</li>
+      <li><b>Kent Ridge Hall Squash</b> — Team Captain</li>
+      <li><b>Kent Ridge Hall Dance</b> — Member</li>
+    </ul>`,
+  socials: `<h2>SAY HI</h2>
+    <p>Always up for a chat about products, AI, or NOC.</p>
+    <ul>
+      <li>📧 <a href="mailto:e1525894@u.nus.edu">e1525894@u.nus.edu</a></li>
+      <li>📱 <a href="tel:+6582007203">+65 8200 7203</a></li>
+      <li>💼 <a href="https://www.linkedin.com/in/yee-chin-chen-68bb6337a" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li>🐙 <a href="https://github.com/yeechinc" target="_blank" rel="noopener">github.com/yeechinc</a></li>
+    </ul>`
+};
+
+function openPanel(id) {
+  panelOpen = true;
+  vx = vy = 0;
+  for (const k in keys) keys[k] = false;
+  for (const d in dpadDir) dpadDir[d] = false;
+  document.getElementById('panel-content').innerHTML = content[id] || '<p>Coming soon</p>';
+  document.getElementById('panel-overlay').style.display = 'flex';
+  promptEl.classList.remove('show');
+}
+function closePanel() {
+  panelOpen = false;
+  document.getElementById('panel-overlay').style.display = 'none';
+}
+// tap the prompt bubble (mobile) to open the focused planet
+promptEl.addEventListener('click', () => {
+  if (focusedId && !panelOpen) openPanel(focusedId);
+});
+// close when tapping the dark backdrop
+document.getElementById('panel-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'panel-overlay') closePanel();
+});
+
+updateAstro();
+</script>
+</body>
+</html>
