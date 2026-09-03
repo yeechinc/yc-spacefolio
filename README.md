@@ -20,9 +20,7 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 
 ## Custom domain (optional)
 
-Netlify → **Domain settings → Add a domain**. If you buy one (e.g. from
-Namecheap/Cloudflare), point it at Netlify with their nameservers or an
-`ALIAS`/`CNAME` record — Netlify walks you through it and provisions HTTPS.
+Netlify → https://app.netlify.com/projects/yeechin-portfolio/deploys
 
 ## Editing content
 
