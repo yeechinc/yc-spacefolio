@@ -17,39 +17,6 @@ cd portfolio-website
 python3 -m http.server 8000   # then visit http://localhost:8000
 ```
 
-## Deploy to Netlify
-
-### Option A — drag & drop (fastest)
-
-1. Go to https://app.netlify.com/drop
-2. Drag the whole `portfolio-website` folder onto the page.
-3. Done — you get a `random-name.netlify.app` URL. Rename it under
-   **Site settings → Change site name**.
-4. To update later: drag the folder again onto **Deploys**.
-
-### Option B — connect a Git repo (auto-deploys on every push)
-
-1. Create the repo (from inside this folder):
-
-   ```bash
-   cd portfolio-website
-   git init
-   git add .
-   git commit -m "Pixel space portfolio"
-   git branch -M main
-   git remote add origin https://github.com/yeechinc/portfolio-website.git
-   git push -u origin main
-   ```
-
-   > Note: there is an accidental `git` repo at `~/.git` on this machine.
-   > It doesn't break anything here (Git uses the closest `.git`, which will be
-   > this folder's), but you may want to clean it up separately.
-
-2. On Netlify: **Add new site → Import an existing project → GitHub →**
-   pick `portfolio-website`.
-3. Build command: *(leave empty)*. Publish directory: `.`
-   (`netlify.toml` already sets this.)
-4. Deploy. Every `git push` now redeploys.
 
 ## Custom domain (optional)
 
