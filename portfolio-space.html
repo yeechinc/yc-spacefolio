@@ -147,31 +147,31 @@
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 190px; height: 190px;
+    width: 340px; height: 340px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #ffe082, #ff9800);
-    box-shadow: 0 0 80px rgba(255, 152, 0, 0.55);
+    box-shadow: 0 0 140px rgba(255, 152, 0, 0.6);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 14px;
+    padding: 28px;
     animation: sun-glow 5s ease-in-out infinite;
   }
   @keyframes sun-glow {
-    0%, 100% { box-shadow: 0 0 70px rgba(255, 152, 0, 0.45); }
-    50%      { box-shadow: 0 0 110px rgba(255, 152, 0, 0.65); }
+    0%, 100% { box-shadow: 0 0 120px rgba(255, 152, 0, 0.5); }
+    50%      { box-shadow: 0 0 190px rgba(255, 152, 0, 0.7); }
   }
   #sun-hi {
     font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
+    font-size: 13px;
     color: #7a3f00;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   #sun-name {
     font-family: 'Press Start 2P', monospace;
-    font-size: 15px;
+    font-size: 24px;
     line-height: 1.3;
     color: #2a1800;
   }
@@ -321,9 +321,9 @@
     #projects { top: 8%;  left: 62%; }
     #hobbies  { top: 62%; left: 60%; }
     #socials  { top: 4%;  left: 40%; width: 84px; height: 68px; }
-    #sun { width: 150px; height: 150px; }
-    #sun-hi { font-size: 8px; }
-    #sun-name { font-size: 12px; }
+    #sun { width: 230px; height: 230px; padding: 20px; }
+    #sun-hi { font-size: 10px; }
+    #sun-name { font-size: 16px; }
     #panel { padding: 22px 18px; max-height: 78vh; }
     #panel h2 { font-size: 12px; }
     #panel p, #panel li { font-size: 12px; }
@@ -423,7 +423,7 @@
 
 <div id="focus-prompt"></div>
 
-<div id="hint">ARROW KEYS / WASD TO MOVE &nbsp;·&nbsp; SPACE TO VIEW</div>
+<div id="hint">ARROW KEYS / WASD TO MOVE &nbsp;·&nbsp; PRESS ENTER KEY TO VIEW</div>
 
 <div id="dpad" aria-hidden="true">
   <button class="up"    data-dir="up">▲</button>
@@ -631,7 +631,7 @@ document.querySelectorAll('#dpad button').forEach(btn => {
 document.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   keys[k] = true;
-  if (k === ' ' || e.code === 'Space') {
+  if (k === 'enter' || e.code === 'Enter') {
     e.preventDefault();
     if (focusedId && !panelOpen) openPanel(focusedId);
     else if (panelOpen) closePanel();
@@ -700,7 +700,7 @@ function updateFocus() {
     focusedId = id;
     if (near) {
       near.classList.add('focused');
-      const verb = document.body.classList.contains('touch') ? 'TAP' : 'SPACE';
+      const verb = document.body.classList.contains('touch') ? 'TAP' : 'PRESS ENTER KEY';
       const what = near.id === 'socials' ? 'CONTACT' : 'VIEW ' + PROMPT_LABELS[near.id];
       promptEl.innerHTML = '<span class="key">&#9670;</span> ' + verb + ' &mdash; ' + what;
       promptEl.classList.toggle('show', !panelOpen);
