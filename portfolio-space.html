@@ -724,59 +724,71 @@ function updateFocus() {
 let panelOpen = false;
 const content = {
   education: `<h2>EDUCATION</h2>
-    <p>Doing a degree that sits right between product and AI.</p>
     <div class="entry-title">National University of Singapore</div>
-    <p>B.Comp, Business AI Systems &nbsp;·&nbsp; Aug 2025 – May 2029</p>
+    <p>Bachelor of Computing, Business Artificial Intelligence Systems &nbsp;·&nbsp; Aug 2025 – May 2029</p>
     <ul>
       <li>NUS Merit Scholarship</li>
-      <li>Coursework across AI systems, data analytics, and product management</li>
-    </ul>`,
+    </ul>
+    <div class="entry-title">Nanyang Junior College</div>
+    <p>GCE A-Levels &nbsp;·&nbsp; 90 rank points</p>
+    <ul>
+      <li>Galileo Programme</li>
+      <li>Honours Roll, 2021</li>
+    </ul>
+    <div class="entry-title">Chung Cheng High School (Yishun)</div>
+    <p>GCE O-Levels &nbsp;·&nbsp; 9 distinctions</p>`,
   work: `<h2>WORK EXPERIENCE</h2>
-    <p>Two PM internships so far — one big platform, one 0-to-1 AI build.</p>
     <div class="entry-title">Shopee — Product Management Intern</div>
     <p>Aug 2026 – present</p>
     <ul>
-      <li>Run UAT on internal portals and app features before they ship</li>
-      <li>Turn stakeholder requirements into proposals for regional teams</li>
-      <li>Dig into competitor moves and market trends to shape the roadmap</li>
+      <li>Conduct UAT for internal portals and app features to make sure releases meet business needs</li>
+      <li>Gather business requirements from stakeholders and propose solutions to regional teams</li>
+      <li>Research competitor practices and market trends to inform product improvements</li>
     </ul>
     <div class="entry-title">Mighty Jaxx — Product Management Intern</div>
     <p>May 2026 – Aug 2026</p>
     <ul>
-      <li>Owned an AI invoice-processing agent from scratch — cut processing time ~80%</li>
-      <li>Wrote the full PRD, user flows, phased roadmap and Jira tickets end to end</li>
-      <li>Designed the extraction layer as shared infra for future internal agents</li>
-      <li>Ran UAT and worked day-to-day with devs and the lead PM</li>
+      <li>Owned 0-to-1 development of an AI-powered invoice processing agent, cutting processing time by ~80%</li>
+      <li>Produced the full PRD, user flows, phased delivery plan and Jira tickets end-to-end; architected the extraction layer as shared infrastructure reusable across future internal agents</li>
+      <li>Conducted UAT for internal products, translating test findings into actionable feedback for developers</li>
+      <li>Collaborated cross-functionally with developers and the lead PM to define requirements, maintain sprint documentation, and keep delivery timelines aligned</li>
+      <li>Prioritised features across a phased roadmap, balancing scope and timelines to keep development on track</li>
     </ul>
     <div class="entry-title">MyBracesClinic — Dental Assistant Intern</div>
     <p>Feb 2025 – Jun 2025</p>
     <ul>
-      <li>Assisted treatments and kept rooms + instruments to hygiene standards</li>
-      <li>Started a recycling initiative for used Invisalign aligners and packaging</li>
-      <li>Used AI tools to help track patients' aligner progress</li>
+      <li>Assisted orthodontists and the dentist during treatments, including routine checkups and sterilisation protocols</li>
+      <li>Prepared dental instruments and treatment rooms in line with hygiene and infection-control standards</li>
+      <li>Drove a sustainability initiative to evaluate recycling solutions for Invisalign aligners and packaging</li>
+      <li>Used AI tools to support monitoring of patients' aligner progress during treatment</li>
+    </ul>
+    <div class="entry-title">Private Tutor — Freelance</div>
+    <p>Jul 2024 – present</p>
+    <ul>
+      <li>Independently teach and manage private tuition for O-Level E-Math, A-Math and Chinese across multiple students</li>
+      <li>One-on-one tutoring tailored to each student's learning style and goals</li>
+      <li>Built custom notes and exam strategies, ran regular assessments, and gave feedback to lift academic performance</li>
     </ul>`,
   projects: `<h2>PROJECTS</h2>
-    <p>Things I've built and shipped, mostly with a team.</p>
     <div class="entry-title">LooWhere? — NUS Orbital (CP2106)</div>
-    <p>Apollo 11 (Advanced) · Honourable Mention · May 2026 – Aug 2026</p>
+    <p>Apollo 11 (Advanced) &nbsp;·&nbsp; Honourable Mention &nbsp;·&nbsp; May 2026 – Aug 2026</p>
     <ul>
-      <li>Community-powered app for finding public toilets in Singapore</li>
-      <li>Learned full-stack from zero: map, filter chips, ratings & reviews</li>
-      <li>Auth + live location data via OneMap and Google Maps APIs</li>
-      <li>React Native / Expo, Node / Express, Supabase — pitched at Splashdown</li>
+      <li>Conceptualised and built a community-powered mobile app for finding public restrooms in Singapore, learning full-stack development from scratch</li>
+      <li>Designed core features — interactive map, filter chips, and a ratings/reviews system — based on real user pain points</li>
+      <li>Implemented user auth and real-world location data via the OneMap and Google Maps APIs, using React Native/Expo, Node.js/Express and Supabase</li>
+      <li>Pitched the app to the public at Splashdown, Orbital's final showcase, earning an Honourable Mention</li>
       <li><a href="https://github.com/yeechinc/loowhere-orbital" target="_blank" rel="noopener">github.com/yeechinc/loowhere-orbital</a></li>
     </ul>
-    <div class="entry-title">SmokeSmart — Hack for Cities 2026</div>
-    <p>Team Lead · Top 8 Finalist · Jan 2026 – Feb 2026</p>
+    <div class="entry-title">SmokeSmart — AI Urban Planning Tool</div>
+    <p>Team Lead &nbsp;·&nbsp; Hack for Cities 2026, Top 8 Finalist &nbsp;·&nbsp; Jan 2026 – Feb 2026</p>
     <ul>
-      <li>AI decision-support tool for placing Designated Smoking Areas</li>
-      <li>Model built from regulatory data, foot traffic and public complaints</li>
-      <li>Geospatial heatmaps + a planning UI for urban planners</li>
-      <li>Pitched to a panel of industry experts</li>
+      <li>Led a cross-functional team to build SmokeSmart, an AI decision-support tool for placing Designated Smoking Areas (DSAs) to reduce second-hand smoke exposure</li>
+      <li>Engineered a multi-variable model synthesising regulatory data, pedestrian mobility patterns and public complaint records to find high-friction zones</li>
+      <li>Defined the product roadmap and features — geospatial heatmaps and an AI-assisted planning interface — translating complex data into usable UX for urban planners</li>
+      <li>Spearheaded rapid prototyping and pitched to a panel of industry experts, securing a Top 8 finalist spot</li>
       <li><a href="https://github.com/yeechinc/smoke-smart-hfc" target="_blank" rel="noopener">github.com/yeechinc/smoke-smart-hfc</a></li>
     </ul>`,
   hobbies: `<h2>CCA</h2>
-    <p>Where the rest of my time at NUS goes.</p>
     <ul>
       <li><b>NUS Developer Group</b> — Head of Product</li>
       <li><b>Kent Ridge Hall FWOC</b> — Programmes Committee</li>
@@ -784,8 +796,17 @@ const content = {
       <li><b>Kent Ridge Enterprise</b> — Member</li>
       <li><b>Kent Ridge Hall Dance</b> — Member</li>
     </ul>`,
+  volunteering: `<h2>VOLUNTEERING</h2>
+    <div class="entry-title">Online Elderly Befriending</div>
+    <p>Overall-in-Charge &nbsp;·&nbsp; Nov 2022 – Dec 2022</p>
+    <ul>
+      <li>Spotted the emotional toll of isolation on elderly residents during the COVID-19 lockdown and designed a virtual engagement programme in response</li>
+      <li>Led the shift to a fully digital format so the service could continue while staying within COVID-19 protocols</li>
+      <li>Managed end-to-end project planning — coordinating classmates, logistics and beneficiaries</li>
+      <li>Reflected on the initiative's social impact and shared key learnings with the school community</li>
+    </ul>`,
   socials: `<h2>SAY HI</h2>
-    <p>Always up for a chat about products, AI, or NOC.</p>
+    <p>Feel free to contact me below!</p>
     <ul>
       <li>📧 <a href="mailto:e1525894@u.nus.edu">e1525894@u.nus.edu</a></li>
       <li>💼 <a href="https://www.linkedin.com/in/yee-chin-chen-68bb6337a" target="_blank" rel="noopener">LinkedIn</a></li>
